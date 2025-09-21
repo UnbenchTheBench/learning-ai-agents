@@ -14,8 +14,21 @@ dotenv.config();
 //     example: z.array(z.string()),
 // });
 
+const sub_endpoint = `https://api.weatherapi.com/v1/forecast.json?key=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}&q=`
+
 async function getWeatherInfo(location) {
-    return `The weather in ${location} is sunny with a high of 25°C.`;
+
+  const endpoint = sub_endpoint + location + "&days=1"
+  
+  const response = await fetch(endpoint);
+  
+  if (!response.ok) {
+      throw new Error(`Error fetching weather data: ${response.statusText}`);
+  }
+  const data = await response.json();
+
+  // Return the raw data instead of using myAgent (to avoid circular dependency)
+  return JSON.stringify(data);
 }
 
 const weatherTool = createTool({
@@ -25,8 +38,8 @@ const weatherTool = createTool({
         location: z.string().describe("The location"),
     }),
     outputSchema: z.string().describe("The weather information for the specified location."),
-    execute: async ({location}) => {
-        return await getWeatherInfo(location);
+    execute: async (args) => {
+        return await getWeatherInfo(args.context.location);
     }
 });
 
