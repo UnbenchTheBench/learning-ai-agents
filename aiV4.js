@@ -31,6 +31,31 @@ async function getWeatherInfo(location) {
   return JSON.stringify(data);
 }
 
+async function getPollenInfo(location) {
+  if (!location) {
+    throw new Error("Location is required for pollen info");
+  }
+
+  const [lat, lon] = location.split(",");
+
+  const res = await fetch(
+    `https://api.ambeedata.com/latest/pollen/by-lat-lng?lat=${lat}&lng=${lon}`,
+    {
+      headers: {
+        "x-api-key": process.env.POLLEN_API_KEY,
+      },
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch pollen data");
+  }
+
+  return res.json();
+}
+
+
+
 const weatherTool = createTool({
     id: "Get Weather Information",
     description: "Fetches weather information for a specific location.",
@@ -43,19 +68,32 @@ const weatherTool = createTool({
     }
 });
 
+const pollenTool = createTool({
+  id: "Get Pollen Information",
+  description: "Fetches pollen information for a specific location using Ambee API.",
+  inputSchema: z.object({
+    location: z.string().describe("Latitude and longitude of the location, comma-separated (lat,lon)"),
+  }),
+  outputSchema: z.string().describe("The pollen information for the specified location."),
+  execute: async (args) => {
+    // Use args.location directly (not args.context.location)
+    return await getPollenInfo(args.location);
+  }
+});
+
 const myAgent = new Agent({
   name: "My Agent",
-  instructions: "You are a helpful assistant.",
+  instructions: "You are a helpful assistant giving info on only the present weather no forecast, and mentioning how it affects pollen levels.",
   model: google("gemini-2.5-flash", {
     apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
   }),
-    tools: [weatherTool],
+    tools: [weatherTool,pollenTool],
 });
 
 async function main() {
   try {
     console.log("🌤️ Testing weather tool:");
-    const weatherResult = await myAgent.generateVNext("What's the weather like in Paris?");
+    const weatherResult = await myAgent.generateVNext("What's the weather like in Houston?");
     console.log("Weather Response:", weatherResult.text); // Fixed: changed from .object to .text
     
   } catch (error) {
