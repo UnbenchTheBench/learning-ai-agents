@@ -14,7 +14,7 @@ const myAgent = new Agent({
 
 async function main() {
   try {
-    const result = await myAgent.generateVNext("Explain how AI works in a few words");
+    const result = await myAgent.generateVNext("What's the weather like in Paris?");
     console.log(result.text);
   } catch (error) {
     console.error("Error:", error.message);
