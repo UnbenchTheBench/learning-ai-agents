@@ -1,0 +1,28 @@
+{
+  "name": "ai-agent",
+  "version": "1.0.0",
+  "description": "AI Agent using Mastra Core",
+  "main": "ai.js",
+  "type": "module",
+  "scripts": {
+    "start": "node ai.js"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "mastra"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@ai-sdk/google": "^2.0.14",
+    "@ai-sdk/openai": "^2.0.32",
+    "@google/genai": "^1.20.0",
+    "@google/generative-ai": "^0.24.1",
+    "@mastra/core": "^0.17.1",
+    "dotenv": "^17.2.2",
+    "ollama": "^0.5.18",
+    "readline-sync": "^1.4.10",
+    "zod": "^3.25.76"
+  }
+}
